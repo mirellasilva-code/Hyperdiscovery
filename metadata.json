@@ -1,0 +1,6 @@
+{
+  "name": "Tribanco Hub de Inteligência de Crédito",
+  "description": "Dashboard executivo e preditivo para gestão de risco de cartões de crédito parceiros com Módulo Farol (detecção de fraudes) e Módulo Radar (calibração de score).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
