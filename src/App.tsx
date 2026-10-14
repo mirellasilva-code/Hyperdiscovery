@@ -206,6 +206,28 @@ export default function App() {
     const targetStore = stores.find((s) => s.id === storeId);
     if (!targetStore) return;
 
+    const now = new Date();
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const formattedTimestamp = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} - ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+    const prevScore = targetStore.calibratedScore || targetStore.currentScoreThreshold;
+    const delta = newScore - prevScore;
+
+    const newAuditEntry = {
+      id: 'calib-' + Date.now(),
+      timestamp: formattedTimestamp,
+      operator: userRole === 'MANAGER'
+        ? 'Mariana Souza • Gerente de Área • SSO: MSO-8492'
+        : 'Rafael Mendes • Analista de Crédito • SSO: RME-1904',
+      previousScore: prevScore,
+      newScore: newScore,
+      scoreDelta: delta,
+      previousDefaultRate: targetStore.defaultRate,
+      projectedDefaultRate: projectedDefault,
+      calibrationReason: `Homologação de nova régua preventiva de corte Serasa/Tribanco para ${targetStore.code}. Contenção de inadimplência local em direção à meta (< 5,0%) com economia de R$ ${savedPCLD.toLocaleString('pt-BR')} em PCLD.`,
+      governanceStatus: 'Homologado (Alçada Gerencial)',
+    };
+
     setStores((prev) =>
       prev.map((s) =>
         s.id === storeId
@@ -215,6 +237,7 @@ export default function App() {
               isCalibrated: true,
               defaultRate: projectedDefault,
               status: projectedDefault <= 5.0 ? 'HEALTHY' : 'WARNING',
+              calibrationHistory: [newAuditEntry, ...(s.calibrationHistory || [])],
             }
           : s
       )

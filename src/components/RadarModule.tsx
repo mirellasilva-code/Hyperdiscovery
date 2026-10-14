@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { PartnerStore } from '../types';
 import { HelpTooltip } from './HelpTooltip';
 import { exportToExcelCsv } from '../utils/exportExcel';
+import { StoreAuditModal } from './StoreAuditModal';
 import { 
   SlidersHorizontal, 
   ShieldCheck, 
@@ -10,7 +11,8 @@ import {
   ArrowRight,
   ChevronDown,
   Download,
-  TrendingDown
+  TrendingDown,
+  History
 } from 'lucide-react';
 
 interface RadarModuleProps {
@@ -34,6 +36,9 @@ export const RadarModule: React.FC<RadarModuleProps> = ({
   const store = useMemo(() => {
     return stores.find((s) => s.id === selectedStoreId) || stores[0];
   }, [stores, selectedStoreId]);
+
+  // Calibration Audit Modal State
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   // Score slider state (default to recommended or current)
   const [sliderScore, setSliderScore] = useState<number>(() => {
@@ -178,10 +183,31 @@ export const RadarModule: React.FC<RadarModuleProps> = ({
 
       {/* Store Selector Bar */}
       <div className={`${panelBg} border rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs transition-colors`}>
-        <div className="flex-1 w-full md:max-w-md">
-          <label className={`text-xs font-bold mb-1.5 block ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
-            Filial Parceira Selecionada para Calibração:
-          </label>
+        <div className="flex-1 w-full md:max-w-xl">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+            <label className={`text-xs font-bold block ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+              Filial Parceira Selecionada para Calibração:
+            </label>
+            
+            {/* Delicate Entry Point Button for Store Calibration Audit Log */}
+            <button
+              type="button"
+              onClick={() => setIsAuditModalOpen(true)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border transition-all cursor-pointer ${
+                isDarkMode 
+                  ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-slate-700' 
+                  : 'bg-white hover:bg-slate-50 text-[#004A75] hover:text-[#003859] border-slate-300 shadow-2xs'
+              }`}
+              title="Consultar Trilha de Auditoria: Histórico de Calibrações da Filial"
+            >
+              <History className="w-3.5 h-3.5 text-[#004A75] dark:text-[#00D2B4]" />
+              <span>🕒 Histórico de Homologações da Filial</span>
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-[#004A75]/10 dark:bg-[#00D2B4]/20 text-[#004A75] dark:text-[#00D2B4] border border-[#004A75]/20 dark:border-[#00D2B4]/30">
+                {(store.calibrationHistory || []).length} anteriores
+              </span>
+            </button>
+          </div>
+
           <div className="relative">
             <select
               value={store.id}
@@ -459,6 +485,15 @@ export const RadarModule: React.FC<RadarModuleProps> = ({
         </div>
 
       </div>
+
+      {/* Store Calibration Audit Trail Modal */}
+      <StoreAuditModal
+        store={store}
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        isDarkMode={isDarkMode}
+        onExportToast={onExportToast}
+      />
 
     </div>
   );

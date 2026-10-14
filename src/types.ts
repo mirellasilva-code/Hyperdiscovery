@@ -61,6 +61,20 @@ export interface PartnerStore {
   cnpjFicticio: string;
   calibratedScore?: number;
   isCalibrated?: boolean;
+  calibrationHistory?: StoreCalibrationAuditEntry[];
+}
+
+export interface StoreCalibrationAuditEntry {
+  id: string;
+  timestamp: string; // "DD/MM/AAAA - HH:mm:ss"
+  operator: string;  // e.g. "Mariana Souza • Gerente de Área • SSO: MSO-8492"
+  previousScore: number;
+  newScore: number;
+  scoreDelta: number; // e.g. +150
+  previousDefaultRate: number; // e.g. 10.4
+  projectedDefaultRate: number; // e.g. 4.8
+  calibrationReason: string;
+  governanceStatus: string; // e.g. "Homologado (Alçada Gerencial)"
 }
 
 export interface HistoricalCohort {
